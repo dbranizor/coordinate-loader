@@ -43,11 +43,12 @@ export default () => {
       console.log(JSON.stringify(feature));
       const polyGeo = feature.geometry;
       console.log('dingo inserting this...',polyGeo)
-      const wktPolygon = wkx.Geometry.parseGeoJSON(polyGeo);
-      wktPolygon.srid = 4326;
-      const wkbPolygon = wktPolygon.toWkb().toString('hex');
+      const wktPolygon = wkx.Geometry.parseGeoJSON(polyGeo).toWkt();
+ 
+      const wktPolygonString = JSON.stringify(wktPolygon);
+      // const wkbPolygon = wktPolygon.toWkb().toString('hex');
 
-      const queryString = `INSERT INTO target_area(id, ooi_id, name, num_merged, target_geometry, center_point) VALUES('${row.id}', '${row.ooi_id}', '${row.name}', ${row.num_merged}, (ST_SetSRID('${wkbPolygon}'::geometry, 4326)), (ST_SetSRID('${wkbCenterPoint}'::geometry, 4326))) ON CONFLICT DO NOTHING;`;
+      const queryString = `INSERT INTO target_area(id, ooi_id, name, num_merged, target_geometry, center_point) VALUES('${row.id}', '${row.ooi_id}', '${row.name}', ${row.num_merged}, ST_SetSRID(ST_GeomFromText('${wktPolygon}'),4326), (ST_SetSRID('${wkbCenterPoint}'::geometry, 4326))) ON CONFLICT DO NOTHING;`;
       query(queryString, [], (data: any, rows: any, results: any) => {
         if (!rows || !results) {
           console.log("dingo error");
@@ -108,7 +109,7 @@ export const parseDDMMSSMM = (coordinate: string): any => {
   console.log("dingo", lat, lon);
 
 
-  return [lat, lon];
+  return [lon, lat];
 };
 
 export const addBuffer = (coordinate: string): string => {

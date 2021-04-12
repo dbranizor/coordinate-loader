@@ -2,9 +2,9 @@ import { Pool } from "pg";
 export default (query: string, values: any, cb: Function) => {
   const pool = new Pool({
     database: 'rstorm',
-    host: 'hunu.nrl.navy.mil',
-    password: 'rpalko123',
-    user: 'rpalko',
+    host: 'localhost',
+    password: 'postgres',
+    user: 'postgres',
     port: 5432
   });
   pool.connect((err, client, release) => {
